@@ -4,6 +4,7 @@ import com.linxb.bean.DiscussPost;
 import com.linxb.bean.User;
 import com.linxb.mapper.DiscussPostMapper;
 import com.linxb.mapper.UserMapper;
+import com.linxb.util.MailClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -64,6 +65,5 @@ class CommunityApplicationTests {
         List<DiscussPost> discussPosts = discussPostMapper.selectDiscussPosts(0, 100, 10);
         discussPosts.forEach(System.out::println);
     }
-
 
 }

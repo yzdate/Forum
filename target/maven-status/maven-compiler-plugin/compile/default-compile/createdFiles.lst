@@ -1,9 +1,0 @@
-com\linxb\service\UserService.class
-com\linxb\bean\User.class
-com\linxb\mapper\UserMapper.class
-com\linxb\service\DiscussPostService.class
-com\linxb\mapper\DiscussPostMapper.class
-com\linxb\bean\Page.class
-com\linxb\CommunityApplication.class
-com\linxb\controller\HomeController.class
-com\linxb\bean\DiscussPost.class
