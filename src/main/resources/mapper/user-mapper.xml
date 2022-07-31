@@ -13,12 +13,12 @@
 
 <!--    User selectByName(String username);-->
     <select id="selectByName" resultType="com.linxb.bean.User">
-        select * from user where name=#{username}
+        select * from user where username=#{username}
     </select>
 
 <!--    User selectByEmail(String email);-->
     <select id="selectByEmail" resultType="com.linxb.bean.User">
-        select * from user where name=#{email}
+        select * from user where email=#{email}
     </select>
 
 
