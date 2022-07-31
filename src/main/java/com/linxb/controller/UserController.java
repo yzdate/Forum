@@ -1,5 +1,6 @@
 package com.linxb.controller;
 
+import com.linxb.annotation.LoginRequired;
 import com.linxb.bean.User;
 import com.linxb.service.UserService;
 import com.linxb.util.CommunityUtil;
@@ -45,11 +46,13 @@ public class UserController {
     @Autowired
     private HostHolder hostHolder;
 
+    @LoginRequired
     @RequestMapping(path = "/setting",method= RequestMethod.GET)
     public String getSettingPage(){
         return "/site/setting";
     }
 
+    @LoginRequired
     @RequestMapping(path="/upload",method = RequestMethod.POST)
     public String uploadHeader(MultipartFile headerImage, Model model){
         // 判断是否上传图片
@@ -149,6 +152,7 @@ public class UserController {
         if(user != null){
             oldpassword = CommunityUtil.md5(oldpassword+user.getSalt());
             if(user.getPassword().equals(oldpassword)){
+                newpassword = CommunityUtil.md5(newpassword+user.getSalt());
                 userService.updatepassword(user.getId(),newpassword);
                 return "redirect:/index";
             }else{

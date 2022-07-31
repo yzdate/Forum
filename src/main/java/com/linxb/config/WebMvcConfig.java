@@ -1,6 +1,8 @@
 package com.linxb.config;
 
+import com.linxb.annotation.LoginRequired;
 import com.linxb.controller.intercepter.AlphaIntercepter;
+import com.linxb.controller.intercepter.LoginRequireInterceptor;
 import com.linxb.controller.intercepter.LoginTicketInterceptor;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +21,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private LoginTicketInterceptor loginTicketInterceptor;
 
+    @Autowired
+    private LoginRequireInterceptor loginRequireInterceptor;
+
     // 注册拦截器
     // excludePathPatterns// 设置路径不被拦截
     @Override
@@ -28,6 +33,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/register","/login");
 
         registry.addInterceptor(loginTicketInterceptor)
+                .excludePathPatterns("/**/*.css","/**/*.js","/**/*.png","/**/*.jpg","/**/*.jpeg");
+
+        registry.addInterceptor(loginRequireInterceptor)
                 .excludePathPatterns("/**/*.css","/**/*.js","/**/*.png","/**/*.jpg","/**/*.jpeg");
     }
 }

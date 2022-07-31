@@ -1,5 +1,8 @@
 package com.linxb.bean;
 
+import com.linxb.util.CommunityUtil;
+import com.linxb.util.HostHolder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -223,10 +226,10 @@ public class Test {
     }
 
     public static void main(String[] args) {
-        String s = "bbaa";
-        String t = "aba";
-        System.out.println(Test.checkInclusion(s,t));
-
+//        String s = "bbaa";
+//        String t = "aba";
+//        System.out.println(Test.checkInclusion(s,t));
+        System.out.println(CommunityUtil.md5("12341234"+"b9108"));
 //        int[][] matrix = {{1,2,3,4},{5,6,7,8},{9,10,11,12}};
 //        System.out.println(Test.spiralOrder(matrix));
     }
