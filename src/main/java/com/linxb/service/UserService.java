@@ -122,6 +122,15 @@ public class UserService implements CommunityContant {
     }
 
 
+    // 更新用户头像
+    public int updateHeader(int userId,String headUrl){
+        return userMapper.updateHeader(userId,headUrl);
+    }
+
+    // 更改密码
+    public int updatepassword(int userId,String newpassword){
+        return userMapper.updatePassword(userId,newpassword);
+    }
 }
 
 
