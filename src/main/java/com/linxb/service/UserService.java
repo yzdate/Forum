@@ -131,6 +131,10 @@ public class UserService implements CommunityContant {
     public int updatepassword(int userId,String newpassword){
         return userMapper.updatePassword(userId,newpassword);
     }
+
+    public User findUserByName(String username){
+        return userMapper.selectByName(username);
+    }
 }
 
 

@@ -11,7 +11,7 @@
 <body>	
 	<div class="nk-container">
 		<!-- 头部 -->
-		<header class="bg-dark sticky-top" >
+		<header class="bg-dark sticky-top" th:fragment="header">
 			<div class="container">
 				<!-- 导航 -->
 				<nav class="navbar navbar-expand-lg navbar-dark">
@@ -27,8 +27,8 @@
 								<a class="nav-link" th:href="@{/index}">首页</a>
 							</li>
 <!--							-->
-							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser==null}">
-								<a class="nav-link position-relative" href="site/letter.html">消息<span class="badge badge-danger">12</span></a>
+							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser!=null}">
+								<a class="nav-link position-relative" th:href="@{/letter/list}">消息<span class="badge badge-danger">12</span></a>
 							</li>
 							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser==null}">
 								<a class="nav-link" th:href="@{/register}">注册</a>
@@ -126,7 +126,7 @@
 						<div class="media-body">
 							<h6 class="mt-0 mb-3">
 								<!--href="#" 链接到当前页面顶部-->
-								<a href="#" th:utext="${map.post.title}">备战春招，面试刷题跟他复习，一个月全搞定！</a>
+								<a href="#" th:href="@{|discuss/detail/${map.post.id}|}" th:utext="${map.post.title}">备战春招，面试刷题跟他复习，一个月全搞定！</a>
 <!--								thymeleaf if 判断-->
 								<span class="badge badge-secondary bg-primary" th:if="${map.post.type==1}">置顶</span>
 								<span class="badge badge-secondary bg-danger" th:if="${map.post.status==1}">精华</span>
@@ -136,16 +136,16 @@
 								<!--#dates #代表引用内置工具-->
 								<u class="mr-3" th:utext="${map.user.username}">寒江雪</u> 发布于 <b th:text="${#dates.format(map.post.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-15 15:32:18</b>
 								<ul class="d-inline float-right">
-									<li class="d-inline ml-2">赞 11</li>
+									<li class="d-inline ml-2">赞 <span th:text="${map.likeCount}">11</span></li>
 									<li class="d-inline ml-2">|</li>
-									<li class="d-inline ml-2">回帖 7</li>
+									<li class="d-inline ml-2">回帖 <i th:text="${map.post.commentCount}">7</i>>></li>
 								</ul>
 							</div>
 						</div>
 					</li>
 				</ul>
 				<!-- 分页 -->
-				<nav class="mt-5" th:if="${page.rows>0}">
+				<nav class="mt-5" th:if="${page.rows>0}" th:fragment="pagination">
 					<ul class="pagination justify-content-center">
 						<li class="page-item">
 							<!--/index?current=1-->
@@ -236,5 +236,38 @@
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
 	<script src="js/global.js"></script>
 	<script src="js/index.js"></script>
+	<script>
+		$(function(){
+			$("#publishBtn").click(publish);
+		});
+		function publish() {
+			/*把弹框隐藏*/
+			$("#publishModal").modal("hide");
+			//获取标题和内容
+			var title = $("#recipient-name").val();
+			var content = $("#message-text").val();
+			//发送异步请求
+			$.post(
+					//global.js中定义的
+					CONTEXT_PATH+"/discuss/add",
+					{"title":title,"content":content},
+					function(data) {
+						/*得到状态和提示消息*/
+						data = $.parseJSON(data);
+						//在提示框中返回消息
+						$("#hintBody").text(data.msg);
+						$("#hintModal").modal("show");
+						/*显示提示框，2秒后自动隐藏提示框*/
+						setTimeout(function(){
+							$("#hintModal").modal("hide");
+							//刷新页面
+							if(data.code==0){
+								window.location.reload();
+							}
+						}, 2000);
+					}
+			)
+		}
+	</script>
 </body>
 </html>
