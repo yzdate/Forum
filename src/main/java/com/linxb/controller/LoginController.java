@@ -5,10 +5,13 @@ import com.linxb.bean.User;
 import com.linxb.service.LoginService;
 import com.linxb.service.UserService;
 import com.linxb.util.CommunityContant;
+import com.linxb.util.CommunityUtil;
+import com.linxb.util.RedisKeyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -25,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Controller
 public class LoginController implements CommunityContant {
@@ -94,14 +98,29 @@ public class LoginController implements CommunityContant {
         return "site/login";
     }
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @RequestMapping(path="/kaptcha",method = RequestMethod.GET)
     public void getKaptcha(HttpServletResponse response, HttpSession session){
         // 生成验证码
         String text = kaptchaProducer.createText();
         BufferedImage image = kaptchaProducer.createImage(text);
 
-        // 将验证码存入session
-        session.setAttribute("kaptcha",text);
+//        // 将验证码存入session
+//        session.setAttribute("kaptcha",text);
+
+        // 将验证码存入redis
+        // 1.生成验证码凭证
+        String kaptchaOwner = CommunityUtil.generateUUID();
+        Cookie cookie = new Cookie("kaptchaOwner",kaptchaOwner);
+        cookie.setMaxAge(60);
+        cookie.setPath(contextpath);
+        response.addCookie(cookie);
+
+        // 2. 存入Redis
+        String redisKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
+        redisTemplate.opsForValue().set(redisKey,text,60, TimeUnit.SECONDS);
 
         // 将图片输出给浏览器
         response.setContentType("image/png");
@@ -117,9 +136,18 @@ public class LoginController implements CommunityContant {
 
     @RequestMapping(path="/login",method=RequestMethod.POST)
     public String login(String username,String password,String code,boolean rememberme,Model model,
-                        HttpSession session,HttpServletResponse httpServletResponse){
+                        HttpSession session,HttpServletResponse httpServletResponse,
+                        @CookieValue("kaptchaOwner") String kaptchaOwner){
         // 在表现层判断验证码
-        String kaptcha = (String) session.getAttribute("kaptcha");
+//        String kaptcha = (String) session.getAttribute("kaptcha");
+        String kaptcha = null;
+
+        // 从Cookie中提取验证码凭证
+        if(!StringUtils.isEmpty(kaptchaOwner)){
+            String redisKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
+            kaptcha = (String) redisTemplate.opsForValue().get(redisKey);
+        }
+
         if(StringUtils.isEmpty(kaptcha) || StringUtils.isEmpty(code)){
             model.addAttribute("codeMsg","验证码不正确");
             return "site/login";
