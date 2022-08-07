@@ -2,7 +2,10 @@ package com.linxb.controller;
 
 import com.linxb.annotation.LoginRequired;
 import com.linxb.bean.User;
+import com.linxb.service.FollowService;
+import com.linxb.service.LikeService;
 import com.linxb.service.UserService;
+import com.linxb.util.CommunityContant;
 import com.linxb.util.CommunityUtil;
 import com.linxb.util.HostHolder;
 import org.slf4j.Logger;
@@ -27,7 +30,7 @@ import java.io.OutputStream;
 
 @Controller
 @RequestMapping("/user")
-public class UserController {
+public class UserController implements CommunityContant {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -164,4 +167,43 @@ public class UserController {
 
         return "/site/setting";
     }
+
+    @Autowired
+    private LikeService likeService;
+
+    @Autowired
+    private FollowService followService;
+
+    // 个人主页
+    @RequestMapping(path = "/profile/{userId}", method=RequestMethod.GET)
+    public String getProfilePage(@PathVariable("userId") int userId,Model model){
+        User user = userService.findUserById(userId);
+        if(user == null){
+            throw new RuntimeException("该用户不存在！");
+        }
+
+        // 用户
+        model.addAttribute("user",user);
+        // 点赞数量
+        int likeCount = likeService.findUserLikeCount(userId);
+        model.addAttribute("likeCount",likeCount);
+
+        // 关注数量
+        long followeeCount = followService.findFolloweeCount(userId,ENTITY_PEOPLE);
+        model.addAttribute("followeeCount",followeeCount);
+
+        // 粉丝数量
+        long followerCount = followService.findFollowerCount(ENTITY_PEOPLE,userId);
+        model.addAttribute("followerCount",followerCount);
+
+        // 是否已关注
+        boolean hasFollowed = false;
+        if(hostHolder.getUsers() != null){
+            hasFollowed = followService.hasFollowed(hostHolder.getUsers().getId(),ENTITY_PEOPLE,userId);
+        }
+        model.addAttribute("hasFollowed",hasFollowed);
+
+        return "/site/profile";
+    }
+
 }
