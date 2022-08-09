@@ -25,4 +25,18 @@ public interface CommunityContant {
 
     // 实体类型：人
     int ENTITY_PEOPLE = 3;
+
+    // 主题 点赞
+    String TOPIC_LIKE = "like";
+
+    // 主题 评论
+    String TOPIC_COMMENT = "comment";
+
+    // 主题 关注
+    String TOPIC_FOLLOW = "follow";
+
+    int SYSTEM_ID = 1;
+
+    // 主题 发帖
+    String TOPIC_PUBLISH = "publish";
 }

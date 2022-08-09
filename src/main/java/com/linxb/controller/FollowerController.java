@@ -1,7 +1,9 @@
 package com.linxb.controller;
 
+import com.linxb.bean.Event;
 import com.linxb.bean.Page;
 import com.linxb.bean.User;
+import com.linxb.event.EventProducer;
 import com.linxb.service.FollowService;
 import com.linxb.service.UserService;
 import com.linxb.util.CommunityContant;
@@ -25,12 +27,24 @@ public class FollowerController implements CommunityContant {
     @Autowired
     private HostHolder hostHolder;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     @RequestMapping(path="/follow", method= RequestMethod.POST)
     @ResponseBody
     public String follow(int entityType, int entityId){
         User user = hostHolder.getUsers();
 
         followService.follow(user.getId(),entityType,entityId);
+
+        // 触发关注事件
+        Event event = new Event()
+                .setUserId(user.getId())
+                .setEntityType(entityType)
+                .setEntityId(entityId)
+                .setEntityUserId(entityId);
+
+        eventProducer.fireEvent(event);
 
         return CommunityUtil.getJsonString(0,"已关注");
     }

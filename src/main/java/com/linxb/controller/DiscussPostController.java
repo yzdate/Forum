@@ -1,9 +1,7 @@
 package com.linxb.controller;
 
-import com.linxb.bean.Comment;
-import com.linxb.bean.DiscussPost;
-import com.linxb.bean.Page;
-import com.linxb.bean.User;
+import com.linxb.bean.*;
+import com.linxb.event.EventProducer;
 import com.linxb.service.CommentService;
 import com.linxb.service.DiscussPostService;
 import com.linxb.service.LikeService;
@@ -39,6 +37,8 @@ public class DiscussPostController implements CommunityContant{
     private HostHolder hostHolder;
     @Autowired
     private LikeService likeService;
+    @Autowired
+    private EventProducer eventProducer;
     @RequestMapping(path = "/add",method = RequestMethod.POST)
     @ResponseBody
     public String addDiscussPost(String title,String content){
@@ -57,7 +57,16 @@ public class DiscussPostController implements CommunityContant{
         post.setContent(content);
         post.setCreateTime(new Date(System.currentTimeMillis()));
         discussPostService.addDiscussPost(post);
-        logger.error("Insert信息");
+
+        // 触发发帖事件
+        Event event = new Event()
+                .setTopic(TOPIC_PUBLISH)
+                .setUserId(user.getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(post.getId());
+
+        eventProducer.fireEvent(event);
+
         //报错的情况统一处理
         return CommunityUtil.getJsonString(0,"发布成功!");
     }

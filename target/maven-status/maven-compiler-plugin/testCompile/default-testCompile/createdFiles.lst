@@ -1,2 +1,5 @@
-com\linxb\CommunityApplicationTests.class
+com\linxb\SensetiveTest.class
 com\linxb\MailTests.class
+com\linxb\KafkaConsumer.class
+com\linxb\CommunityApplicationTests.class
+com\linxb\KafkaProducer.class

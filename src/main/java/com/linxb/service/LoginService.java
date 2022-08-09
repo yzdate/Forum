@@ -92,4 +92,6 @@ public class LoginService {
         String redisKey = RedisKeyUtil.getTicketKey(ticket);
         return (LoginTicket) redisTemplate.opsForValue().get(redisKey);
     }
+
+
 }
